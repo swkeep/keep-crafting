@@ -54,12 +54,43 @@ local function remove_item(src, Player, name, amount)
           "remove")
 end
 
+local function is_job_allowed(Player, item_config)
+     local PlayerJob = Player.PlayerData.job
+     local allowed_jobs = item_config.item_settings.job.allowed_list
+     local allowed_grades = item_config.item_settings.job.allowed_grades
+     if allowed_jobs == nil or #allowed_jobs == 0 then return true end
+     for _, allowed_job in ipairs(allowed_jobs) do
+          if allowed_job == PlayerJob.name then
+               -- check player grade
+               if not allowed_grades[PlayerJob.name] then
+                    return true
+               end
+               if #allowed_grades[PlayerJob.name] == 0 then
+                    return true
+               else
+                    for _, allowed_grade in ipairs(allowed_grades[PlayerJob.name]) do
+                         if allowed_grade == PlayerJob.grade.level then
+                              return true
+                         end
+                    end
+               end
+          end
+     end
+     return false
+end
+
 function StartCraftProcess(src, data)
      local Player = QBCore.Functions.GetPlayer(src)
      local item_config = get_item_data_from_config(data)
      local can_craft = false
 
      if item_config then
+          local restricted_by_job = is_job_allowed(Player, item_config)
+          if not restricted_by_job then
+               TriggerClientEvent('QBCore:Notify', src, 'Crafting this item is restricted.', "error")
+               return
+          end
+
           can_craft = do_player_have_materials(src, Player, item_config)
           if not can_craft then return end
 
@@ -68,9 +99,11 @@ function StartCraftProcess(src, data)
                     remove_item(src, Player, material_name, amount)
                end
           end
-     end
 
-     TriggerClientEvent("keep-crafting:client:start_crafting", src, data, item_config)
+          TriggerClientEvent("keep-crafting:client:start_crafting", src, data, item_config)
+          return
+     end
+     TriggerClientEvent('QBCore:Notify', src, 'Failed to craft!', "error")
 end
 
 local function increase_exp(Player, exp)
@@ -96,4 +129,26 @@ RegisterServerEvent("keep-crafting:server:crafting_is_done", function(data)
      Player.Functions.AddItem(data.item.item_name, item_config.crafting.amount)
      TriggerClientEvent('qb-inventory:client:ItemBox', src, QBCore.Shared.Items[data.item.item_name], "add")
      TriggerClientEvent('QBCore:Notify', src, 'Successful assembly', 'success')
+end)
+
+
+RegisterServerEvent('keep-crafting:check_materials_list', function(data)
+     local player = QBCore.Functions.GetPlayer(source)
+     local item_config = get_item_data_from_config(data)
+
+     local gender = Config.Locale.info.mr
+     if player.PlayerData.charinfo.gender == 1 then
+          gender = Config.Locale.info.mrs
+     end
+     local charinfo = player.PlayerData.charinfo
+
+     if item_config then
+          TriggerClientEvent('keep-crafting:client:local_mailer', source, {
+               gender = gender,
+               charinfo = charinfo,
+               item_name = data.item.item_settings.label,
+               materials = item_config.crafting.materials,
+          })
+     end
+
 end)

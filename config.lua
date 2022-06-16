@@ -1,5 +1,25 @@
 Config = Config or {}
 
+Config.model_loading = {
+     timeout = 1500, --ms
+     dealy = 50, --ms
+}
+
+-- Make it separate
+Config.Locale = {
+     mail = {
+          sender = 'Crafting Company',
+          subject = 'Materials list',
+          message = 'Dear %s %s, <br /><br />List of materials you need to craft (%s): <br />',
+          tnx_message = '<br /><br />we are happy to have you!',
+          materials_list = '<br />%s %dx'
+     },
+     info = {
+          mr = 'Mr.',
+          mrs = 'Mrs.',
+     }
+}
+
 Config.categories = {
      ['misc'] = {
           key = 'misc',
@@ -40,13 +60,12 @@ local misc_recipe = {
           },
           item_settings = {
                label = 'Repair kit',
-               icon = 'fa-solid fa-gun',
+               -- icon = 'fa-solid fa-gun',
                object = {
-                    name = 'v_ind_cs_toolbox4',
+                    name = 'v_ind_cs_toolbox3',
                     rotation = vector3(45.0, 0.0, -45.0)
                },
                image = 'repairkit', -- use inventory's images
-               is_gun = false,
                level = 0,
                job = {
                     allowed_list = {},
@@ -65,30 +84,6 @@ local misc_recipe = {
                exp_per_craft = 5
           }
      },
-     ['bandage'] = {
-          categories = {
-               main = 'misc',
-          },
-          item_settings = {
-               label = 'Bandage',
-               image = 'bandage', -- use inventory's images
-               is_gun = false,
-               level = 0,
-               job = {
-                    allowed_list = {},
-                    allowed_grades = {}
-               }
-          },
-          crafting = {
-               success_rate = 100,
-               amount = 1, -- crafted amount
-               duration = 3,
-               materials = {
-                    ["plastic"] = 1,
-               },
-               exp_per_craft = 5
-          }
-     },
      ['radio'] = {
           categories = {
                main = 'misc',
@@ -100,7 +95,6 @@ local misc_recipe = {
                     name = 'v_serv_radio',
                     rotation = vector3(0.0, 0.0, 0.0)
                },
-               is_gun = false,
                level = 0,
                job = {
                     allowed_list = {},
@@ -120,6 +114,32 @@ local misc_recipe = {
      },
 }
 
+local medial = {
+     ['bandage'] = {
+          categories = {
+               main = 'medical',
+          },
+          item_settings = {
+               label = 'Bandage',
+               image = 'bandage', -- use inventory's images
+               level = 0,
+               job = {
+                    allowed_list = {},
+                    allowed_grades = {}
+               }
+          },
+          crafting = {
+               success_rate = 100,
+               amount = 1, -- crafted amount
+               duration = 3,
+               materials = {
+                    ["plastic"] = 1,
+               },
+               exp_per_craft = 5
+          }
+     },
+}
+
 local weapons_recipe = {
      ['w_ar_carbinerifle'] = {
           categories = {
@@ -132,7 +152,6 @@ local weapons_recipe = {
                     name = 'w_ar_carbinerifle',
                     rotation = vector3(45.0, 0.0, 0.0)
                },
-               is_gun = false,
                level = 0,
                job = {
                     allowed_list = {},
@@ -151,18 +170,17 @@ local weapons_recipe = {
                exp_per_craft = 5
           }
      },
-     ['w_ar_carbineriflemk2_mag1'] = {
+     ['pistol_suppressor'] = {
           categories = {
                sub = 'smg',
           },
           item_settings = {
-               label = 'Rifle Mag',
-               image = 'rifle_drummag', -- use inventory's images
+               label = 'Pistol suppressor',
+               image = 'pistol_suppressor', -- use inventory's images
                object = {
-                    name = 'w_ar_assaultrifle_boxmag',
+                    name = 'w_at_ar_supp_02',
                     rotation = vector3(45.0, 0.0, 0.0)
                },
-               is_gun = false,
                level = 0,
                job = {
                     allowed_list = {},
@@ -180,13 +198,42 @@ local weapons_recipe = {
                },
                exp_per_craft = 5
           }
+     },
+     ['weapon_pistol'] = {
+          categories = {
+               sub = 'pistol',
+          },
+          item_settings = {
+               label = 'Pistol',
+               image = 'weapon_pistol', -- use inventory's images
+               object = {
+                    name = 'w_pi_pistol50',
+                    rotation = vector3(45.0, 0.0, 0.0)
+               },
+               level = 0,
+               job = {
+                    allowed_list = { 'police' },
+                    allowed_grades = { ['police'] = { 4 } }
+               }
+          },
+          crafting = {
+               success_rate = 100,
+               amount = 1, -- crafted amount
+               duration = 5,
+               materials = {
+                    ["metalscrap"] = 25,
+                    ["steel"] = 15,
+                    ["rubber"] = 15,
+               },
+               exp_per_craft = 5
+          }
      }
 }
 
 Config.workbenches = {
      {
           coords = vector3(120.10, 6627.28, 29.55),
-          item_show_case_offset = vector3(0.65, 0.5, 1.2),
+          item_show_case_offset = vector3(0.0, 0.0, 2.25),
           rotation = vector3(0.0, 0.0, 45.0),
           job = {
                allowed_list = { 'police' },
@@ -200,11 +247,11 @@ Config.workbenches = {
           coords = vector3(106.51, 6606.23, 29.55),
           rotation = vector3(0.0, 0.0, 135.0),
           job = {
-               allowed_list = { 'police' },
+               allowed_list = {},
                allowed_grades = {}
           },
           categories = { Config.categories.misc, Config.categories.medical },
-          recipes = { misc_recipe },
+          recipes = { misc_recipe, medial },
           radius = 3.0
      },
      {

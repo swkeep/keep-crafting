@@ -144,7 +144,8 @@ end
 
 function menu:player_crafting_information()
      QBCore.Functions.TriggerCallback('keep-crafting:server:get_player_information', function(result)
-
+          local job_sub = 'Name: %s | Grade: %s'
+          job_sub = string.format(job_sub, result.job.name, result.job.grade.name)
           local Menu = {
                {
                     header = "Go Back",
@@ -156,7 +157,19 @@ function menu:player_crafting_information()
                },
                {
                     header = "Your Name",
-                    subheader = 'Eddie Keep',
+                    subheader = result.charinfo.firstname .. ' ' .. result.charinfo.lastname,
+                    icon = 'fa-solid fa-list-ol',
+                    disabled = true
+               },
+               {
+                    header = "Your Job",
+                    subheader = job_sub,
+                    icon = 'fa-solid fa-list-ol',
+                    disabled = true
+               },
+               {
+                    header = "Your Crafting Level",
+                    subheader = result.metadata.craftingrep,
                     icon = 'fa-solid fa-list-ol',
                     disabled = true
                },
@@ -297,23 +310,12 @@ function menu:crafting_menu(args)
                header = "Check Materials List",
                subheader = 'check inventory for required materials',
                icon = 'fa-solid fa-clipboard-check',
-               args = { 1 },
-               action = function()
-                    menu:crafting_items_list(args[2])
-               end
-          },
-          {
-               header = "Repair",
-               subheader = 'if you already have one and is repairable',
-               icon = 'fa-solid fa-screwdriver-wrench',
-               args = {
-                    'repair', item, Workbench.id
-               },
+               args = { 'sell', item, Workbench.id },
                action = function(args)
-                    TriggerServerEvent('keep-crafting:server:craft_item', {
+                    TriggerServerEvent('keep-crafting:check_materials_list', {
                          type = args[1],
                          item = args[2],
-                         Workbench_id = args[3]
+                         id = args[3]
                     })
                end
           },
@@ -323,10 +325,28 @@ function menu:crafting_menu(args)
                leave = true
           }
      }
+
+     -- {
+     --      header = "Repair",
+     --      subheader = 'if you already have one and is repairable',
+     --      icon = 'fa-solid fa-screwdriver-wrench',
+     --      args = {
+     --           'repair', item, Workbench.id
+     --      },
+     --      action = function(args)
+     --           TriggerServerEvent('keep-crafting:server:craft_item', {
+     --                type = args[1],
+     --                item = args[2],
+     --                Workbench_id = args[3]
+     --           })
+     --      end
+     -- },
      exports["keep-menu"]:createMenu(Menu)
 
      if item.item_settings.object and next(item.item_settings.object) then
-          SpawnAndCameraRemover(entity, box, cam)
+          if entity and box and cam then
+               SpawnAndCameraRemover(entity, box, cam)
+          end
      end
 end
 

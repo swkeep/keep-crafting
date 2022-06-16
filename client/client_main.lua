@@ -1,5 +1,6 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local benches_entites = {}
+local loaded = false
 
 local spawn_bench = function(model, coord, rotation)
      model = model or 'gr_prop_gr_bench_04a'
@@ -11,7 +12,8 @@ local spawn_bench = function(model, coord, rotation)
                Wait(10)
           end
      end
-     local entity = CreateObject(modelHash, coord, true)
+     local entity = CreateObject(modelHash, coord, false)
+     SetEntityAsMissionEntity(entity, true, true)
      while not DoesEntityExist(entity) do Wait(10) end
      SetEntityRotation(entity, rotation, 0.0, true)
      FreezeEntityPosition(entity, true)
@@ -35,26 +37,42 @@ local spawn_bench = function(model, coord, rotation)
      return entity
 end
 
-CreateThread(function()
-     for key, value in pairs(Config.workbenches) do
-          benches_entites[#benches_entites + 1] = spawn_bench(value.table_model, value.coords, value.rotation)
-     end
-end)
+function Load_tables()
+     if loaded then return end
+     CreateThread(function()
+          for key, value in pairs(Config.workbenches) do
+               benches_entites[#benches_entites + 1] = spawn_bench(value.table_model, value.coords, value.rotation)
+          end
+          loaded = true
+     end)
+end
 
 local spawn_object = function(model, position)
      local coord = position.coord
      local modelHash = GetHashKey(model)
      local table_offset = position.offset or vector3(0.15, 0.0, 2.45)
-
+     local timer = 0
+     local timeout = Config.model_loading.timeout
+     local wait_timer = Config.model_loading.dealy
      if not HasModelLoaded(modelHash) then
           RequestModel(modelHash)
           while not HasModelLoaded(modelHash) do
-               Wait(10)
+               Wait(wait_timer)
+               timer = timer + wait_timer
+               if timer >= timeout then
+                    break
+               end
           end
      end
 
-     local entity = CreateObject(model, coord.x + table_offset.x, coord.y + table_offset.y, coord.z + table_offset.z, 0,
+     if not HasModelLoaded(modelHash) then
+          return nil, nil
+     end
+
+     local entity = CreateObject(modelHash, coord.x + table_offset.x, coord.y + table_offset.y, coord.z + table_offset.z
+          , 0,
           0, 0)
+
      while not DoesEntityExist(entity) do Wait(10) end
      SetEntityRotation(entity, position.object_rotation, 0.0, true)
      FreezeEntityPosition(entity, true)
@@ -72,6 +90,7 @@ local spawn_object = function(model, position)
      SetEntityCoords(entity, coord.x + table_offset.x, coord.y + table_offset.y, coord.z + table_offset.z, 0.0, 0.0, 0.0
           , true)
 
+     SetModelAsNoLongerNeeded(modelHash)
      return entity, box
 end
 
@@ -82,6 +101,11 @@ SpawnAndCameraWrapper = function(object, coord, rotation, offset)
           table_rotation = rotation,
           offset = offset
      })
+
+     if not entity and not box then
+          print('failed to load model')
+          return nil, nil, nil
+     end
 
      CreateThread(function()
           while DoesEntityExist(entity) do
@@ -124,7 +148,7 @@ RegisterNetEvent('keep-crafting:client:start_crafting', function(data, item_conf
      local plyped = PlayerPedId()
 
      TriggerEvent('animations:client:EmoteCommandStart', { "mechanic4" })
-     -- makeEntityFaceCoord(plyped, bone_coord)
+     makeEntityFaceCoord(plyped, Workbench.coords)
      QBCore.Functions.Progressbar("keep_Crafting", "Crafting ", item_config.crafting.duration * 1000, false, false, {
           disableMovement = true,
           disableCarMovement = true,
@@ -142,4 +166,41 @@ AddEventHandler('onResourceStop', function(resourceName)
                DeleteObject(value)
           end
      end
+end)
+
+local function firstToUpper(str)
+     return (str:gsub("^%l", string.upper))
+end
+
+RegisterNetEvent('keep-crafting:client:local_mailer', function(data)
+     local Lang = deepcopy(Config.Locale)
+     Lang.mail.message = string.format(Lang.mail.message, data.gender, data.charinfo.lastname, data.item_name)
+     local mat = ''
+     for name, amount in pairs(data.materials) do
+          mat = mat .. " " .. string.format(Lang.mail.materials_list, firstToUpper(name), amount)
+     end
+     Lang.mail.message = Lang.mail.message .. mat .. Lang.mail.tnx_message
+     TriggerServerEvent('qb-phone:server:sendNewMail', {
+          sender = Lang.mail.sender,
+          subject = Lang.mail.subject,
+          message = Lang.mail.message,
+          button = {}
+     })
+end)
+
+AddEventHandler('onResourceStart', function(resourceName)
+     if (GetCurrentResourceName() ~= resourceName) then
+          return
+     end
+     Load_tables()
+end)
+
+RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
+     Wait(1500)
+     Load_tables()
+end)
+
+RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
+     Wait(1500)
+     DeleteEntity(Tmp_entity)
 end)
