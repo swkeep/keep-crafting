@@ -4,6 +4,9 @@
 - [keep-menu](https://github.com/qbcore-framework/qb-menu)
 - [polyzone](https://github.com/qbcore-framework/PolyZone)
 
+# Preview 
+- [video](https://www.youtube.com/watch?v=LOjn07qMLmc)
+
 ## Installation
 
 - Drag and drop resource in your resources list and ensure keep-crafting
