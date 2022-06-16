@@ -168,8 +168,8 @@ function menu:player_crafting_information()
                     disabled = true
                },
                {
-                    header = "Your Crafting Level",
-                    subheader = result.metadata.craftingrep,
+                    header = "Your Crafting exp",
+                    subheader = tostring(result.metadata.craftingrep),
                     icon = 'fa-solid fa-list-ol',
                     disabled = true
                },
