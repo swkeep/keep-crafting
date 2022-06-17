@@ -47,11 +47,11 @@ local misc_recipe = {
                label = 'Repair kit',
                -- icon = 'fa-solid fa-gun',
                object = {
-                    name = 'v_ind_cs_toolbox3',
+                    name = 'v_ind_cs_toolbox4', -- <-- this model can fail to load
                     rotation = vector3(45.0, 0.0, -45.0)
                },
                image = 'repairkit', -- use inventory's images
-               level = 0,
+               level = 40,
                job = {
                     allowed_list = {},
                     allowed_grades = {}
@@ -62,11 +62,10 @@ local misc_recipe = {
                amount = 1, -- crafted amount
                duration = 60,
                materials = {
-                    ["metalscrap"] = 50,
-                    ["steel"] = 60,
-                    ["rubber"] = 30,
+                    ["metalscrap"] = 20,
+                    ["steel"] = 25,
                },
-               exp_per_craft = 5
+               exp_per_craft = 20
           }
      },
      ['radio'] = {
@@ -93,6 +92,34 @@ local misc_recipe = {
                materials = {
                     ["steel"] = 5,
                     ["plastic"] = 5,
+               },
+               exp_per_craft = 5
+          }
+     },
+     ['lockpick'] = {
+          categories = {
+               main = 'misc',
+          },
+          item_settings = {
+               label = 'Lockpick',
+               image = 'lockpick', -- use inventory's images
+               object = {
+                    name = 'prop_cs_padlock',
+                    rotation = vector3(0.0, 0.0, 0.0)
+               },
+               level = 0,
+               job = {
+                    allowed_list = {},
+                    allowed_grades = {}
+               }
+          },
+          crafting = {
+               success_rate = 100,
+               amount = 1, -- crafted amount
+               duration = 60,
+               materials = {
+                    ["steel"] = 20,
+                    ["rubber"] = 20,
                },
                exp_per_craft = 5
           }
@@ -126,18 +153,45 @@ local medial = {
 }
 
 local weapons_recipe = {
-     ['w_ar_carbinerifle'] = {
+     ['pistol_ammo'] = {
           categories = {
-               sub = 'smg',
+               sub = 'pistol',
           },
           item_settings = {
-               label = 'Rifle',
-               image = 'weapon_advancedrifle', -- use inventory's images
+               label = 'Pistol ammo',
+               image = 'pistol_ammo', -- use inventory's images
                object = {
-                    name = 'w_ar_carbinerifle',
+                    name = 'prop_ld_ammo_pack_01',
+                    rotation = vector3(250.0, 0.0, 0.0)
+               },
+               level = 150,
+               job = {
+                    allowed_list = {},
+                    allowed_grades = {}
+               }
+          },
+          crafting = {
+               success_rate = 100,
+               amount = 1, -- crafted amount
+               duration = 30,
+               materials = {
+                    ["steel"] = 30,
+               },
+               exp_per_craft = 5
+          }
+     },
+     ['weapon_pistol'] = {
+          categories = {
+               sub = 'pistol',
+          },
+          item_settings = {
+               label = 'Walther P99',
+               image = 'weapon_pistol', -- use inventory's images
+               object = {
+                    name = 'w_pi_pistol50',
                     rotation = vector3(45.0, 0.0, 0.0)
                },
-               level = 0,
+               level = 150,
                job = {
                     allowed_list = {},
                     allowed_grades = {}
@@ -148,11 +202,69 @@ local weapons_recipe = {
                amount = 1, -- crafted amount
                duration = 60,
                materials = {
-                    ["metalscrap"] = 50,
-                    ["steel"] = 60,
+                    ["aluminum"] = 80,
+                    ["steel"] = 70,
                     ["rubber"] = 30,
                },
-               exp_per_craft = 5
+               exp_per_craft = 30
+          }
+     },
+     ['weapon_combatpistol'] = {
+          categories = {
+               sub = 'pistol',
+          },
+          item_settings = {
+               label = 'Combat Pistol',
+               image = 'weapon_combatpistol', -- use inventory's images
+               object = {
+                    name = 'w_pi_combatpistol',
+                    rotation = vector3(45.0, 0.0, 0.0)
+               },
+               level = 200,
+               job = {
+                    allowed_list = {},
+                    allowed_grades = {}
+               }
+          },
+          crafting = {
+               success_rate = 100,
+               amount = 1, -- crafted amount
+               duration = 60,
+               materials = {
+                    ["aluminum"] = 100,
+                    ["steel"] = 90,
+                    ["rubber"] = 50,
+               },
+               exp_per_craft = 40
+          }
+     },
+     ['weapon_appistol'] = {
+          categories = {
+               sub = 'pistol',
+          },
+          item_settings = {
+               label = 'AP Pistol',
+               image = 'weapon_appistol', -- use inventory's images
+               object = {
+                    name = 'w_pi_appistol',
+                    rotation = vector3(45.0, 0.0, 0.0)
+               },
+               level = 500,
+               job = {
+                    allowed_list = {},
+                    allowed_grades = {}
+               }
+          },
+          crafting = {
+               success_rate = 100,
+               amount = 1, -- crafted amount
+               duration = 60,
+               materials = {
+                    ["aluminum"] = 130,
+                    ["steel"] = 120,
+                    ["rubber"] = 70,
+               },
+               exp_per_craft = 50
           }
      },
      ['pistol_suppressor'] = {
@@ -184,55 +296,17 @@ local weapons_recipe = {
                exp_per_craft = 5
           }
      },
-     ['weapon_pistol'] = {
-          categories = {
-               sub = 'pistol',
-          },
-          item_settings = {
-               label = 'Pistol',
-               image = 'weapon_pistol', -- use inventory's images
-               object = {
-                    name = 'w_pi_pistol50',
-                    rotation = vector3(45.0, 0.0, 0.0)
-               },
-               level = 0,
-               job = {
-                    allowed_list = { 'police' },
-                    allowed_grades = { ['police'] = { 4 } }
-               }
-          },
-          crafting = {
-               success_rate = 100,
-               amount = 1, -- crafted amount
-               duration = 5,
-               materials = {
-                    ["metalscrap"] = 25,
-                    ["steel"] = 15,
-                    ["rubber"] = 15,
-               },
-               exp_per_craft = 5
-          }
-     }
 }
 
 Config.workbench_default_model = 'gr_prop_gr_bench_04a'
 
 Config.workbenches = {
+     -- items
      {
-          coords = vector3(120.10, 6627.28, 29.55),
-          item_show_case_offset = vector3(0.0, 0.0, 2.25),
-          rotation = vector3(0.0, 0.0, 45.0),
-          job = {
-               allowed_list = { 'police' },
-               allowed_grades = { ['police'] = {} }
-          },
-          categories = { Config.categories.weapons },
-          recipes = { weapons_recipe },
-          radius = 3.0
-     },
-     {
-          coords = vector3(106.51, 6606.23, 29.55),
-          rotation = vector3(0.0, 0.0, 135.0),
+          table_model = "gr_prop_gr_bench_04b",
+          coords = vector3(1346.55, 4391.04, 43.36),
+          item_show_case_offset = vector3(0.0, 0.0, 1.3),
+          rotation = vector3(0.0, 0.0, 350),
           job = {
                allowed_list = {},
                allowed_grades = {}
@@ -242,11 +316,37 @@ Config.workbenches = {
           radius = 3.0
      },
      {
-          table_model = 'gr_prop_gr_bench_03a',
-          coords = vector3(-1838.76, 2909.63, 38.90),
-          rotation = vector3(0.0, 0.0, 150.0),
+          table_model = 'gr_prop_gr_bench_04b',
+          coords = vector3(-59.5, 6388.77, 30.49),
+          rotation = vector3(0.0, 0.0, 225.0),
           job = {
-               allowed_list = { 'police' },
+               allowed_list = {},
+               allowed_grades = {}
+          },
+          categories = { Config.categories.misc, Config.categories.medical },
+          recipes = { misc_recipe, medial },
+          radius = 3.0
+     },
+     -- gun
+     {
+          table_model = 'gr_prop_gr_bench_02b',
+          coords = vector3(68, 3684.62, 38.83),
+          item_show_case_offset = vector3(0.0, 0.0, 1.2),
+          rotation = vector3(0.0, 0.0, 235.0),
+          job = {
+               allowed_list = {},
+               allowed_grades = {}
+          },
+          categories = { Config.categories.weapons },
+          recipes = { weapons_recipe },
+          radius = 3.0
+     }, {
+          table_model = 'gr_prop_gr_bench_02b',
+          coords = vector3(2939.04, 4623.81, 47.72),
+          item_show_case_offset = vector3(0.0, 0.0, 1.2),
+          rotation = vector3(0.0, 0.0, 47.0),
+          job = {
+               allowed_list = {},
                allowed_grades = {}
           },
           categories = { Config.categories.weapons },
@@ -255,6 +355,7 @@ Config.workbenches = {
      }
 }
 
+--gr_prop_gr_jailer_keys_01a
 
 -- gr_prop_gr_missle_long
 -- gr_prop_gr_missle_short
