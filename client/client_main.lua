@@ -173,17 +173,19 @@ local function firstToUpper(str)
 end
 
 RegisterNetEvent('keep-crafting:client:local_mailer', function(data)
-     local Lang = deepcopy(Config.Locale)
-     Lang.mail.message = string.format(Lang.mail.message, data.gender, data.charinfo.lastname, data.item_name)
+     local msg = Lang:t('mail.message')
+     local restricted = Lang:t('mail.no')
+     if data.restricted then restricted = Lang:t('mail.yes') end
+     msg = string.format(msg, data.gender, data.charinfo.lastname, data.item_name, data.success_rate, restricted)
      local mat = ''
      for name, amount in pairs(data.materials) do
-          mat = mat .. " " .. string.format(Lang.mail.materials_list, firstToUpper(name), amount)
+          mat = mat .. " " .. string.format(Lang:t('mail.materials_list'), firstToUpper(name), amount)
      end
-     Lang.mail.message = Lang.mail.message .. mat .. Lang.mail.tnx_message
+     msg = msg .. Lang:t('mail.materials_list_header') .. mat .. Lang:t('mail.tnx_message')
      TriggerServerEvent('qb-phone:server:sendNewMail', {
-          sender = Lang.mail.sender,
-          subject = Lang.mail.subject,
-          message = Lang.mail.message,
+          sender = Lang:t('mail.sender'),
+          subject = Lang:t('mail.subject'),
+          message = msg,
           button = {}
      })
 end)

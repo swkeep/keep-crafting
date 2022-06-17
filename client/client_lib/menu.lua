@@ -60,7 +60,7 @@ function GetClosest_Workbenches()
                     v.id = _
                     return true, v
                else
-                    QBCore.Functions.Notify('You are not authorized to do this', 'error')
+                    QBCore.Functions.Notify(Lang:t('error.not_authorized'), 'error')
                     return false
                end
           end
@@ -91,7 +91,7 @@ function menu:main_categories()
      if Workbench == nil then return end
      local Menu = {}
      Menu[#Menu + 1] = {
-          header = "Crafting Workbench",
+          header = Lang:t('menu.main_menu_header'),
           icon = 'fa-solid fa-wrench',
           disabled = true
      }
@@ -125,7 +125,7 @@ function menu:main_categories()
      end
 
      Menu[#Menu + 1] = {
-          header = "Your Crafting Information",
+          header = Lang:t('menu.player_crafting_information'),
           icon = 'fa-solid fa-circle-info',
           args = { 1 },
           action = function()
@@ -134,7 +134,7 @@ function menu:main_categories()
      }
 
      Menu[#Menu + 1] = {
-          header = "Leave",
+          header = Lang:t('menu.leave'),
           event = "keep-menu:closeMenu",
           leave = true
      }
@@ -144,11 +144,11 @@ end
 
 function menu:player_crafting_information()
      QBCore.Functions.TriggerCallback('keep-crafting:server:get_player_information', function(result)
-          local job_sub = 'Name: %s | Grade: %s'
+          local job_sub = Lang:t("menu.job_sub")
           job_sub = string.format(job_sub, result.job.name, result.job.grade.name)
           local Menu = {
                {
-                    header = "Go Back",
+                    header = Lang:t("menu.back"),
                     back = true,
                     args = { 1 },
                     action = function()
@@ -156,25 +156,25 @@ function menu:player_crafting_information()
                     end
                },
                {
-                    header = "Your Name",
+                    header = Lang:t('menu.your_name'),
                     subheader = result.charinfo.firstname .. ' ' .. result.charinfo.lastname,
                     icon = 'fa-solid fa-list-ol',
                     disabled = true
                },
                {
-                    header = "Your Job",
+                    header = Lang:t('menu.your_job'),
                     subheader = job_sub,
                     icon = 'fa-solid fa-list-ol',
                     disabled = true
                },
                {
-                    header = "Your Crafting exp",
+                    header = Lang:t('menu.crafting_exp'),
                     subheader = tostring(result.metadata.craftingrep),
                     icon = 'fa-solid fa-list-ol',
                     disabled = true
                },
                {
-                    header = "Leave",
+                    header = Lang:t('menu.leave'),
                     event = "keep-menu:closeMenu",
                     leave = true
                }
@@ -188,7 +188,7 @@ function menu:sub_categories(args)
      -- args[2] is previous menu cached data (make possible to go back in menus)
      local Menu = {}
      Menu[#Menu + 1] = {
-          header = "Go Back",
+          header = Lang:t("menu.back"),
           back = true,
           args = { 1 },
           action = function()
@@ -211,7 +211,7 @@ function menu:sub_categories(args)
      end
 
      Menu[#Menu + 1] = {
-          header = "Leave",
+          header = Lang:t('menu.leave'),
           event = "keep-menu:closeMenu",
           leave = true
      }
@@ -224,7 +224,7 @@ function menu:crafting_items_list(args)
      local Menu = {}
      if type(args[2]) == "table" then
           Menu[#Menu + 1] = {
-               header = "Go Back",
+               header = Lang:t("menu.back"),
                back = true,
                args = { 1 },
                action = function()
@@ -233,7 +233,7 @@ function menu:crafting_items_list(args)
           }
      elseif args[2] == 'main' then
           Menu[#Menu + 1] = {
-               header = "Go Back",
+               header = Lang:t("menu.back"),
                back = true,
                args = { 1 },
                action = function()
@@ -259,7 +259,7 @@ function menu:crafting_items_list(args)
      end
 
      Menu[#Menu + 1] = {
-          header = "Leave",
+          header = Lang:t('menu.leave'),
           event = "keep-menu:closeMenu",
           leave = true
      }
@@ -278,7 +278,7 @@ function menu:crafting_menu(args)
 
      local Menu = {
           {
-               header = "Go Back",
+               header = Lang:t("menu.back"),
                back = true,
                args = { 1 },
                action = function()
@@ -286,13 +286,13 @@ function menu:crafting_menu(args)
                end
           },
           {
-               header = "Item Name",
+               header = Lang:t('menu.item_name'),
                subheader = item.item_settings.label,
                icon = 'fa-solid fa-list-ol',
                disabled = true
           },
           {
-               header = "Craft",
+               header = Lang:t('menu.craft'),
                subheader = 'craft current item',
                icon = 'fa-solid fa-pen-ruler',
                args = {
@@ -307,7 +307,7 @@ function menu:crafting_menu(args)
                end
           },
           {
-               header = "Check Materials List",
+               header = Lang:t('menu.check_mat_list'),
                subheader = 'check inventory for required materials',
                icon = 'fa-solid fa-clipboard-check',
                args = { 'sell', item, Workbench.id },
@@ -320,7 +320,7 @@ function menu:crafting_menu(args)
                end
           },
           {
-               header = "Leave",
+               header = Lang:t('menu.leave'),
                event = "keep-menu:closeMenu",
                leave = true
           }

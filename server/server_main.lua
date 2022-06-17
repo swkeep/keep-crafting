@@ -44,14 +44,13 @@ local function do_player_have_materials(src, Player, item_config)
      if total == count then
           return true
      end
-     TriggerClientEvent('QBCore:Notify', src, 'You dont have enough materials', "error")
+     TriggerClientEvent('QBCore:Notify', src, Lang:t('error.need_more_mat'), "error")
      return false
 end
 
 local function remove_item(src, Player, name, amount)
      Player.Functions.RemoveItem(name, amount)
-     TriggerClientEvent('qb-inventory:client:ItemBox', src, QBCore.Shared.Items[name],
-          "remove")
+     TriggerClientEvent('qb-inventory:client:ItemBox', src, QBCore.Shared.Items[name], "remove")
 end
 
 local function is_job_allowed(Player, item_config)
@@ -85,9 +84,15 @@ function StartCraftProcess(src, data)
      local can_craft = false
 
      if item_config then
+          if item_config.item_settings.level and
+              not (Player.PlayerData.metadata.craftingrep >= item_config.item_settings.level) then
+               TriggerClientEvent('QBCore:Notify', src, Lang:t('error.need_more_exp'), "error")
+               return
+          end
+
           local restricted_by_job = is_job_allowed(Player, item_config)
           if not restricted_by_job then
-               TriggerClientEvent('QBCore:Notify', src, 'Crafting this item is restricted.', "error")
+               TriggerClientEvent('QBCore:Notify', src, Lang:t('error.crafting_is_restricted'), "error")
                return
           end
 
@@ -103,7 +108,7 @@ function StartCraftProcess(src, data)
           TriggerClientEvent("keep-crafting:client:start_crafting", src, data, item_config)
           return
      end
-     TriggerClientEvent('QBCore:Notify', src, 'Failed to craft!', "error")
+     TriggerClientEvent('QBCore:Notify', src, Lang:t('error.crafting_failed'), "error")
 end
 
 local function increase_exp(Player, exp)
@@ -120,7 +125,7 @@ RegisterServerEvent("keep-crafting:server:crafting_is_done", function(data)
      local SuccessRate = item_config.crafting.success_rate
 
      if not (SuccessRate >= chance) then
-          TriggerClientEvent('QBCore:Notify', src, 'Crafting Failed! ^.^', 'error')
+          TriggerClientEvent('QBCore:Notify', src, Lang:t('error.crafting_failed'), 'error')
           return
      end
 
@@ -128,19 +133,19 @@ RegisterServerEvent("keep-crafting:server:crafting_is_done", function(data)
 
      Player.Functions.AddItem(data.item.item_name, item_config.crafting.amount)
      TriggerClientEvent('qb-inventory:client:ItemBox', src, QBCore.Shared.Items[data.item.item_name], "add")
-     TriggerClientEvent('QBCore:Notify', src, 'Successful assembly', 'success')
+     TriggerClientEvent('QBCore:Notify', src, Lang:t('success.successful_crafting'), 'success')
 end)
 
 
 RegisterServerEvent('keep-crafting:check_materials_list', function(data)
-     local player = QBCore.Functions.GetPlayer(source)
+     local Player = QBCore.Functions.GetPlayer(source)
      local item_config = get_item_data_from_config(data)
 
-     local gender = Config.Locale.info.mr
-     if player.PlayerData.charinfo.gender == 1 then
-          gender = Config.Locale.info.mrs
+     local gender = Lang:t('info.mr')
+     if Player.PlayerData.charinfo.gender == 1 then
+          gender = Lang:t('info.mrs')
      end
-     local charinfo = player.PlayerData.charinfo
+     local charinfo = Player.PlayerData.charinfo
 
      if item_config then
           TriggerClientEvent('keep-crafting:client:local_mailer', source, {
@@ -148,6 +153,8 @@ RegisterServerEvent('keep-crafting:check_materials_list', function(data)
                charinfo = charinfo,
                item_name = data.item.item_settings.label,
                materials = item_config.crafting.materials,
+               success_rate = item_config.crafting.success_rate,
+               restricted = not is_job_allowed(Player, item_config)
           })
      end
 

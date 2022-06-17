@@ -5,21 +5,6 @@ Config.model_loading = {
      dealy = 50, --ms
 }
 
--- Make it separate
-Config.Locale = {
-     mail = {
-          sender = 'Crafting Company',
-          subject = 'Materials list',
-          message = 'Dear %s %s, <br /><br />List of materials you need to craft (%s): <br />',
-          tnx_message = '<br /><br />we are happy to have you!',
-          materials_list = '<br />%s %dx'
-     },
-     info = {
-          mr = 'Mr.',
-          mrs = 'Mrs.',
-     }
-}
-
 Config.categories = {
      ['misc'] = {
           key = 'misc',
@@ -122,7 +107,7 @@ local medial = {
           item_settings = {
                label = 'Bandage',
                image = 'bandage', -- use inventory's images
-               level = 0,
+               level = 125,
                job = {
                     allowed_list = {},
                     allowed_grades = {}
