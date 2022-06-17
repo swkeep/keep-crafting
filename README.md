@@ -1,7 +1,7 @@
 # Dependencies
 
 - [qb-target](https://github.com/BerkieBb/qb-target)
-- [keep-menu]([https://github.com/qbcore-framework/qb-menu](https://github.com/swkeep/keep-menu))
+- [keep-menu](https://github.com/swkeep/keep-menu)
 - [polyzone](https://github.com/qbcore-framework/PolyZone)
 
 # Preview 
