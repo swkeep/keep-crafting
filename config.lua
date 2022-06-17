@@ -215,6 +215,8 @@ local weapons_recipe = {
      }
 }
 
+Config.workbench_default_model = 'gr_prop_gr_bench_04a'
+
 Config.workbenches = {
      {
           coords = vector3(120.10, 6627.28, 29.55),

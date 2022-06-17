@@ -3,7 +3,7 @@ local benches_entites = {}
 local loaded = false
 
 local spawn_bench = function(model, coord, rotation)
-     model = model or 'gr_prop_gr_bench_04a'
+     model = model or Config.workbench_default_model
      local modelHash = GetHashKey(model)
 
      if not HasModelLoaded(modelHash) then
