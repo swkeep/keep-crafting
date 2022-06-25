@@ -140,12 +140,20 @@ end)
 RegisterServerEvent('keep-crafting:check_materials_list', function(data)
      local Player = QBCore.Functions.GetPlayer(source)
      local item_config = get_item_data_from_config(data)
+     local level = nil
 
      local gender = Lang:t('info.mr')
      if Player.PlayerData.charinfo.gender == 1 then
           gender = Lang:t('info.mrs')
      end
      local charinfo = Player.PlayerData.charinfo
+
+     if item_config.crafting.show_level_in_mail then
+          level = item_config.item_settings.level
+          level = tostring(level)
+     else
+          level = nil
+     end
 
      if item_config then
           TriggerClientEvent('keep-crafting:client:local_mailer', source, {
@@ -154,7 +162,8 @@ RegisterServerEvent('keep-crafting:check_materials_list', function(data)
                item_name = data.item.item_settings.label,
                materials = item_config.crafting.materials,
                success_rate = item_config.crafting.success_rate,
-               restricted = not is_job_allowed(Player, item_config)
+               restricted = not is_job_allowed(Player, item_config),
+               level = level
           })
      end
 

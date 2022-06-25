@@ -17,6 +17,7 @@ local Translations = {
           sender = 'Crafting Company',
           subject = 'Materials list',
           message = 'Dear %s %s, <br /><br />List of materials you need to craft (%s): <br /><br /> * Success rate: %d, <br /> * Restricted: %s <br />',
+          level = ' * Level: %s <br />',
           yes = 'Yes',
           no = 'No',
           tnx_message = '<br /><br />We are happy to have you!',

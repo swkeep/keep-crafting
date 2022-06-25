@@ -114,6 +114,7 @@ local misc_recipe = {
                }
           },
           crafting = {
+               show_level_in_mail = true,
                success_rate = 100,
                amount = 1, -- crafted amount
                duration = 60,
