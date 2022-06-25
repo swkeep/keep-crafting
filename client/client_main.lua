@@ -187,7 +187,8 @@ RegisterNetEvent('keep-crafting:client:local_mailer', function(data)
 
      local mat = ''
      for name, amount in pairs(data.materials) do
-          mat = mat .. " " .. string.format(Lang:t('mail.materials_list'), firstToUpper(name), amount)
+          local _name = QBCore.Shared.Items[name]
+          mat = mat .. " " .. string.format(Lang:t('mail.materials_list'), _name.label, amount)
      end
      msg = msg .. Lang:t('mail.materials_list_header') .. mat .. Lang:t('mail.tnx_message')
      TriggerServerEvent('qb-phone:server:sendNewMail', {
