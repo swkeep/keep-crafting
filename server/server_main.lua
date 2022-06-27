@@ -176,6 +176,7 @@ RegisterServerEvent('keep-crafting:check_materials_list', function(data)
      end
 
      local condition = nil
+     local restricted = false
      if item_config.item_settings.job then
           condition = {
                type = 'job',
@@ -183,12 +184,18 @@ RegisterServerEvent('keep-crafting:check_materials_list', function(data)
           }
      end
 
-     if item_config.item_settings.job then
+     if item_config.item_settings.gang then
           condition = {
                type = 'gang',
                data = item_config.item_settings.gang
           }
      end
+
+     if (item_config.item_settings.gang or item_config.item_settings.job) then
+          restricted = not is_job_allowed(Player, condition.data, condition.type)
+     end
+
+     if condition == nil then restricted = false end
 
      if item_config then
           TriggerClientEvent('keep-crafting:client:local_mailer', source, {
@@ -197,7 +204,7 @@ RegisterServerEvent('keep-crafting:check_materials_list', function(data)
                item_name = data.item.item_settings.label,
                materials = item_config.crafting.materials,
                success_rate = item_config.crafting.success_rate,
-               restricted = not is_job_allowed(Player, condition.data, condition.type),
+               restricted = restricted,
                level = level
           })
      end
