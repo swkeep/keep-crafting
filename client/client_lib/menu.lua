@@ -4,6 +4,7 @@ local QBCore = exports['qb-core']:GetCoreObject()
 
 --   Variable
 local PlayerJob = nil
+local PlayerGang = nil
 local menu = {}
 Workbench = nil
 ------------------
@@ -20,24 +21,34 @@ local function updatePlayerJob()
           Wait(10)
      until QBCore.Functions.GetPlayerData().job ~= nil
      PlayerJob = QBCore.Functions.GetPlayerData().job
+     PlayerGang = QBCore.Functions.GetPlayerData().gang
 end
 
-local function isJobAllowed(job_list)
+local function isJobAllowed(list, type)
      -- check player job
+     if not list then return end
      updatePlayerJob()
 
-     if #job_list.allowed_list == 0 then return true end
-     for _, allowed_job in ipairs(job_list.allowed_list) do
-          if allowed_job == PlayerJob.name then
+     local condition = nil
+     if type == 'job' then
+          condition = PlayerJob
+     else
+          condition = PlayerGang
+     end
+
+     if #list.allowed_list == 0 then return true end
+
+     for _, allowed_job in ipairs(list.allowed_list) do
+          if allowed_job == condition.name then
                -- check player grade
-               if not job_list.allowed_grades[PlayerJob.name] then
+               if not list.allowed_grades[condition.name] then
                     return true
                end
-               if #job_list.allowed_grades[PlayerJob.name] == 0 then
+               if #list.allowed_grades[condition.name] == 0 then
                     return true
                else
-                    for _, allowed_grades in ipairs(job_list.allowed_grades[PlayerJob.name]) do
-                         if allowed_grades == PlayerJob.grade.level then
+                    for _, allowed_grades in ipairs(list.allowed_grades[condition.name]) do
+                         if allowed_grades == condition.grade.level then
                               return true
                          end
                     end
@@ -56,13 +67,14 @@ function GetClosest_Workbenches()
           local distance = #(playercoords - v.coords)
           if distance < 2.6 then
 
-               if isJobAllowed(v.job) then
+               if isJobAllowed(v.gang, 'gang') or isJobAllowed(v.job, 'job') then
                     v.id = _
                     return true, v
                else
                     QBCore.Functions.Notify(Lang:t('error.not_authorized'), 'error')
                     return false
                end
+
           end
      end
      return false

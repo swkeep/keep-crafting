@@ -53,22 +53,28 @@ local function remove_item(src, Player, name, amount)
      TriggerClientEvent('qb-inventory:client:ItemBox', src, QBCore.Shared.Items[name], "remove")
 end
 
-local function is_job_allowed(Player, item_config)
-     local PlayerJob = Player.PlayerData.job
-     local allowed_jobs = item_config.item_settings.job.allowed_list
-     local allowed_grades = item_config.item_settings.job.allowed_grades
+local function is_job_allowed(Player, data, type)
+     local condition = nil
+     if type == 'job' then
+          condition = Player.PlayerData.job
+     else
+          condition = Player.PlayerData.gang
+     end
+     local allowed_jobs = data.allowed_list
+     local allowed_grades = data.allowed_grades
+
      if allowed_jobs == nil or #allowed_jobs == 0 then return true end
      for _, allowed_job in ipairs(allowed_jobs) do
-          if allowed_job == PlayerJob.name then
+          if allowed_job == condition.name then
                -- check player grade
-               if not allowed_grades[PlayerJob.name] then
+               if not allowed_grades[condition.name] then
                     return true
                end
-               if #allowed_grades[PlayerJob.name] == 0 then
+               if #allowed_grades[condition.name] == 0 then
                     return true
                else
-                    for _, allowed_grade in ipairs(allowed_grades[PlayerJob.name]) do
-                         if allowed_grade == PlayerJob.grade.level then
+                    for _, allowed_grade in ipairs(allowed_grades[condition.name]) do
+                         if allowed_grade == condition.grade.level then
                               return true
                          end
                     end
@@ -90,7 +96,21 @@ function StartCraftProcess(src, data)
                return
           end
 
-          local restricted_by_job = is_job_allowed(Player, item_config)
+          local condition = nil
+          if item_config.item_settings.job then
+               condition = {
+                    type = 'job',
+                    data = item_config.item_settings.job
+               }
+          end
+          if item_config.item_settings.gang then
+               condition = {
+                    type = 'gang',
+                    data = item_config.item_settings.gang
+               }
+          end
+
+          local restricted_by_job = is_job_allowed(Player, condition.data, condition.type)
           if not restricted_by_job then
                TriggerClientEvent('QBCore:Notify', src, Lang:t('error.crafting_is_restricted'), "error")
                return
@@ -155,6 +175,21 @@ RegisterServerEvent('keep-crafting:check_materials_list', function(data)
           level = nil
      end
 
+     local condition = nil
+     if item_config.item_settings.job then
+          condition = {
+               type = 'job',
+               data = item_config.item_settings.job
+          }
+     end
+
+     if item_config.item_settings.job then
+          condition = {
+               type = 'gang',
+               data = item_config.item_settings.gang
+          }
+     end
+
      if item_config then
           TriggerClientEvent('keep-crafting:client:local_mailer', source, {
                gender = gender,
@@ -162,7 +197,7 @@ RegisterServerEvent('keep-crafting:check_materials_list', function(data)
                item_name = data.item.item_settings.label,
                materials = item_config.crafting.materials,
                success_rate = item_config.crafting.success_rate,
-               restricted = not is_job_allowed(Player, item_config),
+               restricted = not is_job_allowed(Player, condition.data, condition.type),
                level = level
           })
      end

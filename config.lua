@@ -111,7 +111,8 @@ local misc_recipe = {
                job = {
                     allowed_list = {},
                     allowed_grades = {}
-               }
+               },
+
           },
           crafting = {
                show_level_in_mail = true,
@@ -139,7 +140,11 @@ local medial = {
                job = {
                     allowed_list = {},
                     allowed_grades = {}
-               }
+               },
+               -- gang = {
+               --      allowed_list = {},
+               --      allowed_grades = {}
+               -- }
           },
           crafting = {
                success_rate = 100,
@@ -308,10 +313,15 @@ Config.workbenches = {
           coords = vector3(1346.55, 4391.04, 43.36),
           item_show_case_offset = vector3(0.0, 0.0, 1.3),
           rotation = vector3(0.0, 0.0, 350),
+          -- just use either job or gang using both at same time won't work.
           job = {
                allowed_list = {},
                allowed_grades = {}
           },
+          -- gang = {
+          --      allowed_list = {},
+          --      allowed_grades = {}
+          -- },
           categories = { Config.categories.misc, Config.categories.medical },
           recipes = { misc_recipe, medial },
           radius = 3.0
