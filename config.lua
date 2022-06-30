@@ -1,5 +1,7 @@
 Config = Config or {}
 
+Config.menu = 'qb-menu' -- keep-menu (recommended) / qb-menu
+
 Config.model_loading = {
      timeout = 1500, --ms
      dealy = 50, --ms
