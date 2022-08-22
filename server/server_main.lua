@@ -210,3 +210,27 @@ RegisterServerEvent('keep-crafting:check_materials_list', function(data)
      end
 
 end)
+
+QBCore.Commands.Add("keepcrafting", "increase exp of crafting for a player", {
+     {
+          name = "cid",
+          help = "player id"
+     },
+     {
+          name = "type",
+          help = "increase/decrease"
+     },
+     {
+          name = "amount",
+          help = "exp"
+     }
+}, true, function(source, args)
+     -- test exp
+     local Type = args[2]:lower()
+     local Player = QBCore.Functions.GetPlayer(tonumber(args[1]))
+     if Type == 'increase' then
+          Player.Functions.SetMetaData("craftingrep", Player.PlayerData.metadata["craftingrep"] + tonumber(args[3]))
+     elseif 'decrease' then
+          Player.Functions.SetMetaData("craftingrep", Player.PlayerData.metadata["craftingrep"] - tonumber(args[3]))
+     end
+end, "admin")

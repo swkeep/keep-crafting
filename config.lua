@@ -286,7 +286,8 @@ local weapons_recipe = {
                     name = 'w_at_ar_supp_02',
                     rotation = vector3(45.0, 0.0, 0.0)
                },
-               level = 0,
+               level = 5,
+               hide_until_reaches_level = true,
                job = {
                     allowed_list = {},
                     allowed_grades = {}
@@ -321,8 +322,8 @@ Config.workbenches = {
                allowed_grades = {}
           },
           -- gang = {
-          --      allowed_list = {},
-          --      allowed_grades = {}
+          --      allowed_list = { 'ballas' },
+          --      allowed_grades = { ['ballas'] = { 1, 2, 3, 4 } }
           -- },
           categories = { Config.categories.misc, Config.categories.medical },
           recipes = { misc_recipe, medial },
@@ -358,9 +359,9 @@ Config.workbenches = {
           coords = vector3(2939.04, 4623.81, 47.72),
           item_show_case_offset = vector3(0.0, 0.0, 1.2),
           rotation = vector3(0.0, 0.0, 47.0),
-          job = {
-               allowed_list = {},
-               allowed_grades = {}
+          gang = {
+               allowed_list = { 'ballas' },
+               allowed_grades = { ['ballas'] = { 1, 2, 3, 4 } }
           },
           categories = { Config.categories.weapons },
           recipes = { weapons_recipe },
