@@ -526,6 +526,7 @@ function QbMenu:crafting_items_list(args)
      local items = search_for_items_in_category(args[1])
      local craftingrep = QBCore.Functions.GetPlayerData().metadata.craftingrep
      local Menu = {}
+
      if type(args[2]) == "table" then
           Menu[#Menu + 1] = {
                header = Lang:t("menu.back"),
@@ -551,28 +552,24 @@ function QbMenu:crafting_items_list(args)
                     Menu[#Menu + 1] = {
                          header = item.item_settings.label or item_name,
                          icon = item.item_settings.icon or 'fa-solid fa-caret-right',
-                         submenu = true,
-                         image = item.item_settings.image or nil,
-                         args = {
-                              item, args
-                         },
-                         action = function(item)
-                              menu:crafting_menu(item)
-                         end
+                         params = {
+                              args = {
+                                   item, args
+                              },
+                              event = 'keep-crafting:client_lib:crafting_menu'
+                         }
                     }
                end
           else
                Menu[#Menu + 1] = {
                     header = item.item_settings.label or item_name,
                     icon = item.item_settings.icon or 'fa-solid fa-caret-right',
-                    submenu = true,
-                    image = item.item_settings.image or nil,
-                    args = {
-                         item, args
-                    },
-                    action = function(item)
-                         menu:crafting_menu(item)
-                    end
+                    params = {
+                         args = {
+                              item, args
+                         },
+                         event = 'keep-crafting:client_lib:crafting_menu'
+                    }
                }
           end
      end
