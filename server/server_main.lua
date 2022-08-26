@@ -160,8 +160,11 @@ end)
 RegisterServerEvent('keep-crafting:check_materials_list', function(data)
      local Player = QBCore.Functions.GetPlayer(source)
      local item_config = get_item_data_from_config(data)
+     if not item_config then
+          assert(false, 'failed to get `item_config`')
+          return
+     end
      local level = nil
-
      local gender = Lang:t('info.mr')
      if Player.PlayerData.charinfo.gender == 1 then
           gender = Lang:t('info.mrs')
