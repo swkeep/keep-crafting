@@ -50,7 +50,8 @@ end
 
 local function remove_item(src, Player, name, amount)
      Player.Functions.RemoveItem(name, amount)
-     TriggerClientEvent('qb-inventory:client:ItemBox', src, QBCore.Shared.Items[name], "remove")
+     --TriggerClientEvent('qb-inventory:client:ItemBox', src, QBCore.Shared.Items[name], "remove")
+	 TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[name], "remove")
 end
 
 local function is_job_allowed(Player, data, type)
@@ -152,7 +153,8 @@ RegisterServerEvent("keep-crafting:server:crafting_is_done", function(data)
      increase_exp(Player, item_config.crafting.exp_per_craft)
 
      Player.Functions.AddItem(data.item.item_name, item_config.crafting.amount)
-     TriggerClientEvent('qb-inventory:client:ItemBox', src, QBCore.Shared.Items[data.item.item_name], "add")
+	 TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[data.item.item_name], "add")
+     --TriggerClientEvent('qb-inventory:client:ItemBox', src, QBCore.Shared.Items[data.item.item_name], "add")
      TriggerClientEvent('QBCore:Notify', src, Lang:t('success.successful_crafting'), 'success')
 end)
 
