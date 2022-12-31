@@ -115,7 +115,7 @@ local misc_recipe = {
                label = 'Lockpick',
                image = 'lockpick', -- use inventory's images
                object = {
-                    name = 'prop_ld_crocclips01',
+                    name = 'prop_tool_screwdvr01',
                     rotation = vector3(0.0, 0.0, 0.0)
                },
                level = 0,
