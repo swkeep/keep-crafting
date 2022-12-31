@@ -14,6 +14,18 @@ QBCore.Functions.CreateCallback('keep-crafting:server:get_player_information', f
      })
 end)
 
+QBCore.Functions.CreateCallback('keep-crafting:server:get_player_blueprints', function(source, cb)
+     local player = QBCore.Functions.GetPlayer(source)
+     local blueprints = player.Functions.GetItemsByName('blueprint_document')
+     local results = {}
+     for k, item in pairs(blueprints) do
+          if item.info.item_settings then
+               results[item.info.item_settings.item] = item.info
+          end
+     end
+     cb(results)
+end)
+
 RegisterNetEvent('keep-crafting:server:craft_item', function(data)
      local src = source
      StartCraftProcess(src, data)
@@ -86,7 +98,7 @@ end
 
 function StartCraftProcess(src, data)
      local Player = QBCore.Functions.GetPlayer(src)
-     local item_config = get_item_data_from_config(data)
+     local item_config = data.item
      local can_craft = false
 
      if item_config then
@@ -138,7 +150,7 @@ end
 RegisterServerEvent("keep-crafting:server:crafting_is_done", function(data)
      local src = source
      local Player = QBCore.Functions.GetPlayer(src)
-     local item_config = get_item_data_from_config(data)
+     local item_config = data.item
      if not item_config then return end
 
      local chance = math.random(0, 100)
@@ -159,7 +171,7 @@ end)
 
 RegisterServerEvent('keep-crafting:check_materials_list', function(data)
      local Player = QBCore.Functions.GetPlayer(source)
-     local item_config = get_item_data_from_config(data)
+     local item_config = data.item
      if not item_config then
           assert(false, 'failed to get `item_config`')
           return
@@ -237,3 +249,37 @@ QBCore.Commands.Add("keepcrafting", "increase exp of crafting for a player", {
           Player.Functions.SetMetaData("craftingrep", Player.PlayerData.metadata["craftingrep"] - tonumber(args[3]))
      end
 end, "admin")
+
+QBCore.Commands.Add("giveblueprint", "Give blueprint to self", {}, true, function(source, args)
+     local BlueprintInfoExample = {
+          categories = {
+               main = 'blueprints',
+          },
+          item_settings = {
+               label = 'Assault Rifle Mk II',
+               item = 'weapon_assaultrifle_mk2',
+               image = 'weapon_assaultrifle_mk2', -- use inventory's images
+               object = {
+                    name = 'w_ar_assaultrifle',
+                    rotation = vector3(45.0, 0.0, 0.0)
+               },
+               level = 0,
+               job = {
+                    allowed_list = {},
+                    allowed_grades = {}
+               }
+          },
+          crafting = {
+               success_rate = 100,
+               amount = 1, -- crafted amount
+               duration = 60,
+               materials = {
+                    ["plastic"] = 4,
+               },
+               exp_per_craft = 50
+          }
+     }
+     local src = source
+     exports['qb-inventory']:AddItem(src, 'blueprint_document', 1, false, BlueprintInfoExample)
+
+end, "god")

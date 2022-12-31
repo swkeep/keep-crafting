@@ -5,6 +5,7 @@ local QBCore = exports['qb-core']:GetCoreObject()
 --   Variable
 local PlayerJob = nil
 local PlayerGang = nil
+local PlayerBlueprints = {}
 local menu = {}
 local QbMenu = {}
 Workbench = nil
@@ -20,6 +21,12 @@ end
 ------------------
 --   functions
 ------------------
+
+local function updatePlayerBluePrints()
+     QBCore.Functions.TriggerCallback('keep-crafting:server:get_player_blueprints', function(result)
+          PlayerBlueprints = result
+     end)
+end
 
 local function updatePlayerJob()
      repeat
@@ -64,6 +71,7 @@ local function isJobAllowed(list, type)
 end
 
 function GetClosest_Workbenches()
+     updatePlayerBluePrints()
      local ped = PlayerPedId()
      local playercoords = GetEntityCoords(ped)
      local benches = Config.workbenches
@@ -86,6 +94,9 @@ function GetClosest_Workbenches()
 end
 
 local function search_for_items_in_category(category)
+     if category == 'blueprints' then
+          return PlayerBlueprints
+     end
      local tmp = {}
      for key, recipe in pairs(Workbench.recipes) do
           for k, item in pairs(recipe) do
@@ -94,6 +105,9 @@ local function search_for_items_in_category(category)
                end
                if not item.categories.main and item.categories.sub and item.categories.sub == category then
                     tmp[k] = item
+               end
+               if category == 'blueprints' and PlayerBlueprints[k] then
+                    tmp[k] = PlayerBlueprints[k].info
                end
           end
      end

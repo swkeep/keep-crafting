@@ -97,7 +97,7 @@ end
 SpawnAndCameraWrapper = function(object, coord, rotation, offset)
      local entity, box = spawn_object(object.name, {
           coord = coord,
-          object_rotation = object.rotation,
+          object_rotation = vector3(object.rotation.x, object.rotation.y, object.rotation.z),
           table_rotation = rotation,
           offset = offset
      })

@@ -1,6 +1,6 @@
 Config = Config or {}
 
-Config.menu = 'qb-menu' -- keep-menu (recommended) / qb-menu
+Config.menu = 'keep-menu' -- keep-menu (recommended) / qb-menu
 
 Config.model_loading = {
      timeout = 1500, --ms
@@ -36,7 +36,13 @@ Config.categories = {
           label = 'Medical',
           icon = 'fa-solid fa-hand-holding-medical',
           jobs = {}
-     }
+     },
+     ['blueprints'] = {
+          key = 'blueprints',
+          label = 'Blueprints Craft',
+          icon = 'fa-solid fa-file',
+          jobs = {}
+     },
 }
 
 Config.permanent_items = {
@@ -52,7 +58,7 @@ local misc_recipe = {
                label = 'Repair kit',
                -- icon = 'fa-solid fa-gun',
                object = {
-                    name = 'v_ind_cs_toolbox4', -- <-- this model can fail to load
+                    name = 'prop_tool_box_04', -- <-- this model can fail to load
                     rotation = vector3(45.0, 0.0, -45.0)
                },
                image = 'repairkit', -- use inventory's images
@@ -385,19 +391,19 @@ Config.workbenches = {
      --      recipes = { weapons_recipe, misc_recipe, medial },
      --      radius = 3.0
      -- },
-     -- {
-     --      table_model = 'gr_prop_gr_bench_02b',
-     --      coords = vector3(-2680.05, 1332.35, 139.88),
-     --      item_show_case_offset = vector3(0.0, 0.0, 1.2),
-     --      rotation = vector3(0.0, 0.0, 90.0),
-     --      job = {
-     --           allowed_list = {},
-     --           allowed_grades = {}
-     --      },
-     --      categories = { Config.categories.weapons, Config.categories.misc, Config.categories.medical },
-     --      recipes = { weapons_recipe, misc_recipe, medial },
-     --      radius = 3.0
-     -- },
+     {
+          table_model = 'gr_prop_gr_bench_02b',
+          coords = vector3(407.5, -1612.91, 28.29),
+          item_show_case_offset = vector3(0.0, 0.0, 1.2),
+          rotation = vector3(0.0, 0.0, 90.0),
+          job = {
+               allowed_list = {},
+               allowed_grades = {}
+          },
+          categories = { Config.categories.blueprints, Config.categories.weapons, Config.categories.misc, Config.categories.medical },
+          recipes = { weapons_recipe, misc_recipe, medial },
+          radius = 3.0
+     },
      -- {
      --      table_model = 'gr_prop_gr_bench_02b',
      --      coords = vector3(2939.04, 4623.81, 47.72),
