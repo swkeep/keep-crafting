@@ -106,9 +106,6 @@ local function search_for_items_in_category(category)
                if not item.categories.main and item.categories.sub and item.categories.sub == category then
                     tmp[k] = item
                end
-               if category == 'blueprints' and PlayerBlueprints[k] then
-                    tmp[k] = PlayerBlueprints[k].info
-               end
           end
      end
      return tmp
