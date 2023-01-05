@@ -119,6 +119,10 @@ local function does_player_has_blueprint(Player, blueprint_id)
      return false
 end
 
+local function increase_exp(Player, exp)
+     Player.Functions.SetMetaData("craftingrep", Player.PlayerData.metadata["craftingrep"] + exp)
+end
+
 local function StartCraftProcess(src, data)
      local item_name = data.item_name
      local Player = QBCore.Functions.GetPlayer(src)
@@ -183,32 +187,22 @@ local function StartCraftProcess(src, data)
      end
 
      TriggerClientEvent("keep-crafting:client:start_crafting", src, data, item_config)
+     SetTimeout(item_config.crafting.duration * 1000, function()
+          local chance = math.random(0, 100)
+          local SuccessRate = item_config.crafting.success_rate
+
+          if not (SuccessRate >= chance) then
+               TriggerClientEvent('QBCore:Notify', src, Lang:t('error.crafting_failed'), 'error')
+               return
+          end
+
+          increase_exp(Player, item_config.crafting.exp_per_craft)
+
+          Player.Functions.AddItem(item_name, item_config.crafting.amount)
+          TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[item_name], "add")
+          TriggerClientEvent('QBCore:Notify', src, Lang:t('success.successful_crafting'), 'success')
+     end)
 end
-
-local function increase_exp(Player, exp)
-     Player.Functions.SetMetaData("craftingrep", Player.PlayerData.metadata["craftingrep"] + exp)
-end
-
-RegisterServerEvent("keep-crafting:server:crafting_is_done", function(data)
-     local src = source
-     local Player = QBCore.Functions.GetPlayer(src)
-     local item_config = data.item
-     if not item_config then return end
-
-     local chance = math.random(0, 100)
-     local SuccessRate = item_config.crafting.success_rate
-
-     if not (SuccessRate >= chance) then
-          TriggerClientEvent('QBCore:Notify', src, Lang:t('error.crafting_failed'), 'error')
-          return
-     end
-
-     increase_exp(Player, item_config.crafting.exp_per_craft)
-
-     Player.Functions.AddItem(data.item.item_name, item_config.crafting.amount)
-     TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[data.item.item_name], "add")
-     TriggerClientEvent('QBCore:Notify', src, Lang:t('success.successful_crafting'), 'success')
-end)
 
 RegisterServerEvent('keep-crafting:check_materials_list', function(data)
      local src = source

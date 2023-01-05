@@ -43,7 +43,7 @@ local Blueprints = {
         crafting = {
             success_rate = 100,
             amount = 1, -- crafted amount
-            duration = 60,
+            duration = 5,
             materials = {
                 ["plastic"] = 4,
             },

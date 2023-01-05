@@ -156,7 +156,6 @@ RegisterNetEvent('keep-crafting:client:start_crafting', function(data, item_conf
           disableCombat = true
      }, {}, {}, {}, function()
           TriggerEvent('animations:client:EmoteCommandStart', { "c" })
-          TriggerServerEvent('keep-crafting:server:crafting_is_done', data)
      end)
 end)
 
