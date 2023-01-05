@@ -256,7 +256,6 @@ function menu:crafting_items_list(data)
           Menu[#Menu + 1] = {
                header = Lang:t("menu.back"),
                back = true,
-               args = { 1 },
                action = function()
                     menu:sub_categories(data[2])
                end
@@ -265,14 +264,15 @@ function menu:crafting_items_list(data)
           Menu[#Menu + 1] = {
                header = Lang:t("menu.back"),
                back = true,
-               args = { 1 },
                action = function()
                     menu:main_categories()
                end
           }
      end
      for item_name, item in pairs(items) do
-          item.item_name = item_name -- inject item name into item's data
+          if not item.item_name then
+               item.item_name = item_name -- inject item name into item's data
+          end
           -- hide if we set it to hide when players has not reached the level/exp
           if item.item_settings.hide_until_reaches_level then
                if craftingrep >= item.item_settings.level then
@@ -281,25 +281,20 @@ function menu:crafting_items_list(data)
                          icon = item.item_settings.icon or 'fa-solid fa-caret-right',
                          submenu = true,
                          image = item.item_settings.image or nil,
-                         args = {
-                              item, data
-                         },
-                         action = function(item)
-                              menu:crafting_menu(item)
+                         action = function()
+                              menu:crafting_menu(item, data)
                          end
                     }
                end
           else
                Menu[#Menu + 1] = {
                     header = item.item_settings.label or item_name,
+                    subheader = item.blueprint_id and 'Serial: ' .. item.blueprint_id,
                     icon = item.item_settings.icon or 'fa-solid fa-caret-right',
                     submenu = true,
                     image = item.item_settings.image or nil,
-                    args = {
-                         item, data
-                    },
-                    action = function(item)
-                         menu:crafting_menu(item)
+                    action = function()
+                         menu:crafting_menu(item, data)
                     end
                }
           end
@@ -307,29 +302,26 @@ function menu:crafting_items_list(data)
 
      Menu[#Menu + 1] = {
           header = Lang:t('menu.leave'),
-          event = "keep-menu:closeMenu",
           leave = true
      }
 
      exports["keep-menu"]:createMenu(Menu)
 end
 
-function menu:crafting_menu(args)
-     local item = args[1]
+function menu:crafting_menu(item, data)
      local entity, box, cam
 
      if item.item_settings.object and next(item.item_settings.object) then
-          entity, box, cam = SpawnAndCameraWrapper(item.item_settings.object, Workbench.coords, Workbench.rotation,
-               Workbench.item_show_case_offset)
+          entity, box, cam = SpawnAndCameraWrapper(item.item_settings.object, Workbench.coords, Workbench.rotation, Workbench.item_show_case_offset)
      end
+     print(data.item_name)
 
      local Menu = {
           {
                header = Lang:t("menu.back"),
                back = true,
-               args = { 1 },
                action = function()
-                    menu:crafting_items_list(args[2])
+                    menu:crafting_items_list(data)
                end
           },
           {
@@ -342,14 +334,12 @@ function menu:crafting_menu(args)
                header = Lang:t('menu.craft'),
                subheader = 'craft current item',
                icon = 'fa-solid fa-pen-ruler',
-               args = {
-                    'sell', item, Workbench.id
-               },
-               action = function(args)
+               action = function()
                     TriggerServerEvent('keep-crafting:server:craft_item', {
-                         type = args[1],
-                         item = args[2],
-                         id = args[3]
+                         type = 'sell',
+                         item_name = item.item_name,
+                         blueprint_id = item.blueprint_id or nil,
+                         id = Workbench.id
                     })
                end
           },
@@ -357,18 +347,16 @@ function menu:crafting_menu(args)
                header = Lang:t('menu.check_mat_list'),
                subheader = 'check inventory for required materials',
                icon = 'fa-solid fa-clipboard-check',
-               args = { 'sell', item, Workbench.id },
-               action = function(args)
+               action = function()
                     TriggerServerEvent('keep-crafting:check_materials_list', {
-                         type = args[1],
-                         item = args[2],
-                         id = args[3]
+                         type = 'sell',
+                         item = item,
+                         id = Workbench.id
                     })
                end
           },
           {
                header = Lang:t('menu.leave'),
-               event = "keep-menu:closeMenu",
                leave = true
           }
      }

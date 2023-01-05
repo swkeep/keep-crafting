@@ -18,17 +18,16 @@ QBCore.Functions.CreateCallback('keep-crafting:server:get_player_blueprints', fu
      local player = QBCore.Functions.GetPlayer(source)
      local blueprints = player.Functions.GetItemsByName('blueprint_document')
      local results = {}
-     for k, item in pairs(blueprints) do
-          if item.info.item_settings then
-               results[item.info.item_settings.item] = item.info
+     for _, item in pairs(blueprints) do
+          local blueprint = item.info['blueprint']
+          if blueprint and IsBlueprint(blueprint) then
+               blueprint = GetBlueprint(blueprint)
+               blueprint.blueprint_id = item.info.blueprint_id
+               blueprint.item_name = item.info['blueprint']
+               results[#results + 1] = blueprint
           end
      end
      cb(results)
-end)
-
-RegisterNetEvent('keep-crafting:server:craft_item', function(data)
-     local src = source
-     StartCraftProcess(src, data)
 end)
 
 local function do_player_have_materials(src, Player, item_config)
@@ -85,51 +84,74 @@ local function is_job_allowed(Player, data, type)
      return false
 end
 
-function StartCraftProcess(src, data)
-     local Player = QBCore.Functions.GetPlayer(src)
-     local item_config = data.item
-     local can_craft = false
-
-     if item_config then
-          if item_config.item_settings.level and
-              not (Player.PlayerData.metadata.craftingrep >= item_config.item_settings.level) then
-               TriggerClientEvent('QBCore:Notify', src, Lang:t('error.need_more_exp'), "error")
-               return
-          end
-
-          local condition = nil
-          if item_config.item_settings.job then
-               condition = {
-                    type = 'job',
-                    data = item_config.item_settings.job
-               }
-          end
-          if item_config.item_settings.gang then
-               condition = {
-                    type = 'gang',
-                    data = item_config.item_settings.gang
-               }
-          end
-
-          local restricted_by_job = is_job_allowed(Player, condition.data, condition.type)
-          if not restricted_by_job then
-               TriggerClientEvent('QBCore:Notify', src, Lang:t('error.crafting_is_restricted'), "error")
-               return
-          end
-
-          can_craft = do_player_have_materials(src, Player, item_config)
-          if not can_craft then return end
-
-          for material_name, amount in pairs(item_config.crafting.materials) do
-               if not Config.permanent_items[material_name] then
-                    remove_item(src, Player, material_name, amount)
+local function get_item_config(data)
+     if Config.workbenches[data.id].recipes then
+          for key, recipe in pairs(Config.workbenches[data.id].recipes) do
+               if recipe[data.item_name] then
+                    return recipe[data.item_name]
                end
           end
+     end
+     return nil
+end
 
-          TriggerClientEvent("keep-crafting:client:start_crafting", src, data, item_config)
+local function StartCraftProcess(src, data)
+     local item_name = data.item_name
+     local Player = QBCore.Functions.GetPlayer(src)
+     local item_config = nil
+     local can_craft = false
+
+     if IsBlueprint(item_name) and data['blueprint_id'] then
+          item_config = GetBlueprint(item_name)
+     elseif not IsBlueprint(item_name) and data['blueprint_id'] then
+          -- item is a blueprint but we don't have it in our blueprint list
+          print(Colors.red .. ('Item [%s] do not exist in our blueprint.lua'):format(item_name))
+          return
+     elseif not data['blueprint_id'] then
+          -- normal items
+          item_config = get_item_config(data)
+     end
+
+     if not item_config then
+          TriggerClientEvent('QBCore:Notify', src, Lang:t('error.crafting_failed'), "error")
           return
      end
-     TriggerClientEvent('QBCore:Notify', src, Lang:t('error.crafting_failed'), "error")
+     if item_config.item_settings.level and
+         not (Player.PlayerData.metadata.craftingrep >= item_config.item_settings.level) then
+          TriggerClientEvent('QBCore:Notify', src, Lang:t('error.need_more_exp'), "error")
+          return
+     end
+
+     local condition = nil
+     if item_config.item_settings.job then
+          condition = {
+               type = 'job',
+               data = item_config.item_settings.job
+          }
+     end
+     if item_config.item_settings.gang then
+          condition = {
+               type = 'gang',
+               data = item_config.item_settings.gang
+          }
+     end
+
+     local restricted_by_job = is_job_allowed(Player, condition.data, condition.type)
+     if not restricted_by_job then
+          TriggerClientEvent('QBCore:Notify', src, Lang:t('error.crafting_is_restricted'), "error")
+          return
+     end
+
+     can_craft = do_player_have_materials(src, Player, item_config)
+     if not can_craft then return end
+
+     for material_name, amount in pairs(item_config.crafting.materials) do
+          if not Config.permanent_items[material_name] then
+               remove_item(src, Player, material_name, amount)
+          end
+     end
+
+     TriggerClientEvent("keep-crafting:client:start_crafting", src, data, item_config)
 end
 
 local function increase_exp(Player, exp)
@@ -156,7 +178,6 @@ RegisterServerEvent("keep-crafting:server:crafting_is_done", function(data)
      TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[data.item.item_name], "add")
      TriggerClientEvent('QBCore:Notify', src, Lang:t('success.successful_crafting'), 'success')
 end)
-
 
 RegisterServerEvent('keep-crafting:check_materials_list', function(data)
      local src = source
@@ -215,6 +236,28 @@ RegisterServerEvent('keep-crafting:check_materials_list', function(data)
 end)
 
 --------------------
+--   EVENTS
+--------------------
+RegisterNetEvent('keep-crafting:server:craft_item', function(data)
+     local src = source
+     StartCraftProcess(src, data)
+end)
+
+--------------------
+--   EXPORTS
+--------------------
+
+local function GiveBlueprint(src, blueprint_name)
+     local blueprint = IsBlueprint(blueprint_name)
+     if not blueprint then return false end
+     exports['qb-inventory']:AddItem(src, 'blueprint_document', 1, false, {
+          blueprint = blueprint_name,
+          blueprint_id = RandomID(7)
+     })
+end
+
+exports('GiveBlueprint', GiveBlueprint)
+--------------------
 --   COMMANDS
 --------------------
 
@@ -240,38 +283,22 @@ QBCore.Commands.Add("keepcrafting", "increase exp of crafting for a player", {
      elseif 'decrease' then
           Player.Functions.SetMetaData("craftingrep", Player.PlayerData.metadata["craftingrep"] - tonumber(args[3]))
      end
-end, "admin")
+end, "god")
 
-QBCore.Commands.Add("giveblueprint", "Give blueprint to self", {}, true, function(source, args)
-     local BlueprintInfoExample = {
-          categories = {
-               main = 'blueprints',
-          },
-          item_settings = {
-               label = 'Assault Rifle Mk II',
-               item = 'weapon_assaultrifle_mk2',
-               image = 'weapon_assaultrifle_mk2', -- use inventory's images
-               object = {
-                    name = 'w_ar_assaultrifle',
-                    rotation = vector3(45.0, 0.0, 0.0)
-               },
-               level = 0,
-               job = {
-                    allowed_list = {},
-                    allowed_grades = {}
-               }
-          },
-          crafting = {
-               success_rate = 100,
-               amount = 1, -- crafted amount
-               duration = 60,
-               materials = {
-                    ["plastic"] = 4,
-               },
-               exp_per_craft = 50
-          }
-     }
+QBCore.Commands.Add("giveblueprint", "Give blueprint to self", {
+     {
+          name = "name",
+          help = "blueprint name"
+     },
+}, true, function(source, args)
      local src = source
-     exports['qb-inventory']:AddItem(src, 'blueprint_document', 1, false, BlueprintInfoExample)
-
+     local name = args[1]:lower()
+     local is_blueprint = IsBlueprint(name)
+     if not is_blueprint then
+          TriggerClientEvent('QBCore:Notify', src, 'Blueprint name is not valid', 'error')
+          return
+     else
+          GiveBlueprint(src, name)
+          TriggerClientEvent('QBCore:Notify', src, ('A blueprint of [%s] added to your inventory.'):format(name), 'success')
+     end
 end, "god")

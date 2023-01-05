@@ -99,3 +99,26 @@ function deepcopy(orig, copies)
      end
      return copy
 end
+
+Colors = {
+     red = "\027[31m",
+     green = "\027[32m",
+     orange = "\027[33m",
+     cyan = "\027[36m",
+     gray = "\027[90m",
+     grey = "\027[90m",
+     light_green = "\027[92m",
+     yellow = "\027[93m",
+     blue = "\027[94m",
+}
+
+function round(num, dp)
+     local mult = 10 ^ (dp or 0)
+     return math.floor(num * mult + 0.5) / mult
+end
+
+function Tablelength(T)
+     local count = 0
+     for _ in pairs(T) do count = count + 1 end
+     return count
+end
