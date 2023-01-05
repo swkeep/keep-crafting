@@ -280,6 +280,7 @@ function menu:crafting_items_list(data)
                if craftingrep >= item.item_settings.level then
                     Menu[#Menu + 1] = {
                          header = item.item_settings.label or item.item_name,
+                         subheader = item.blueprint_id and 'Serial: ' .. item.blueprint_id,
                          icon = item.item_settings.icon or 'fa-solid fa-caret-right',
                          submenu = true,
                          image = item.item_settings.image or nil,

@@ -274,10 +274,14 @@ end)
 
 local function GiveBlueprint(src, blueprint_name)
      local blueprint = IsBlueprint(blueprint_name)
+     local temp = nil
      if not blueprint then return false end
+     temp = GetBlueprint(blueprint_name)
+     local label = temp and temp.item_settings.label or QBCore.Shared.Items[blueprint_name].name
      exports['qb-inventory']:AddItem(src, 'blueprint_document', 1, false, {
           blueprint = blueprint_name,
-          blueprint_id = RandomID(7)
+          blueprint_id = RandomID(7),
+          blueprint_label = label
      })
 end
 
