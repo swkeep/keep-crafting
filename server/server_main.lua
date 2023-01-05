@@ -31,17 +31,6 @@ RegisterNetEvent('keep-crafting:server:craft_item', function(data)
      StartCraftProcess(src, data)
 end)
 
-local function get_item_data_from_config(data)
-     if Config.workbenches[data.id].recipes then
-          for key, recipe in pairs(Config.workbenches[data.id].recipes) do
-               if recipe[data.item.item_name] then
-                    return recipe[data.item.item_name]
-               end
-          end
-     end
-     return nil
-end
-
 local function do_player_have_materials(src, Player, item_config)
      local total = 0
      local count = 0
