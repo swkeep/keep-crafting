@@ -13,6 +13,7 @@ shared_scripts {
 client_scripts {
      '@PolyZone/client.lua',
      '@PolyZone/BoxZone.lua',
+     'client/mailer.lua',
      'client/client_main.lua',
      'client/client_lib/menu.lua'
 }

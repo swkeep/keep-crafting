@@ -159,7 +159,8 @@ end)
 
 
 RegisterServerEvent('keep-crafting:check_materials_list', function(data)
-     local Player = QBCore.Functions.GetPlayer(source)
+     local src = source
+     local Player = QBCore.Functions.GetPlayer(src)
      local item_config = data.item
      if not item_config then
           assert(false, 'failed to get `item_config`')
@@ -200,9 +201,8 @@ RegisterServerEvent('keep-crafting:check_materials_list', function(data)
      end
 
      if condition == nil then restricted = false end
-
      if item_config then
-          TriggerClientEvent('keep-crafting:client:local_mailer', source, {
+          TriggerClientEvent('keep-crafting:client:local_mailer', src, {
                gender = gender,
                charinfo = charinfo,
                item_name = data.item.item_settings.label,
@@ -212,8 +212,11 @@ RegisterServerEvent('keep-crafting:check_materials_list', function(data)
                level = level
           })
      end
-
 end)
+
+--------------------
+--   COMMANDS
+--------------------
 
 QBCore.Commands.Add("keepcrafting", "increase exp of crafting for a player", {
      {
