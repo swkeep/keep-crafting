@@ -269,15 +269,17 @@ function menu:crafting_items_list(data)
                end
           }
      end
+
      for item_name, item in pairs(items) do
           if not item.item_name then
                item.item_name = item_name -- inject item name into item's data
           end
+
           -- hide if we set it to hide when players has not reached the level/exp
           if item.item_settings.hide_until_reaches_level then
                if craftingrep >= item.item_settings.level then
                     Menu[#Menu + 1] = {
-                         header = item.item_settings.label or item_name,
+                         header = item.item_settings.label or item.item_name,
                          icon = item.item_settings.icon or 'fa-solid fa-caret-right',
                          submenu = true,
                          image = item.item_settings.image or nil,
@@ -288,7 +290,7 @@ function menu:crafting_items_list(data)
                end
           else
                Menu[#Menu + 1] = {
-                    header = item.item_settings.label or item_name,
+                    header = item.item_settings.label or item.item_name,
                     subheader = item.blueprint_id and 'Serial: ' .. item.blueprint_id,
                     icon = item.item_settings.icon or 'fa-solid fa-caret-right',
                     submenu = true,
@@ -314,7 +316,6 @@ function menu:crafting_menu(item, data)
      if item.item_settings.object and next(item.item_settings.object) then
           entity, box, cam = SpawnAndCameraWrapper(item.item_settings.object, Workbench.coords, Workbench.rotation, Workbench.item_show_case_offset)
      end
-     print(data.item_name)
 
      local Menu = {
           {
@@ -362,7 +363,6 @@ function menu:crafting_menu(item, data)
      }
 
      exports["keep-menu"]:createMenu(Menu)
-
      if item.item_settings.object and next(item.item_settings.object) then
           if entity and box and cam then
                SpawnAndCameraRemover(entity, box, cam)

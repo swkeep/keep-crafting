@@ -1,4 +1,11 @@
 local QBCore = exports['qb-core']:GetCoreObject()
+local MagicTouch = true
+
+function PrintDebug(...)
+     if MagicTouch then
+          print(Colors.blue .. 'CraftingDebug:', ...)
+     end
+end
 
 QBCore.Functions.CreateCallback('keep-crafting:server:get_player_information', function(source, cb)
      local player = QBCore.Functions.GetPlayer(source)
@@ -15,8 +22,8 @@ QBCore.Functions.CreateCallback('keep-crafting:server:get_player_information', f
 end)
 
 QBCore.Functions.CreateCallback('keep-crafting:server:get_player_blueprints', function(source, cb)
-     local player = QBCore.Functions.GetPlayer(source)
-     local blueprints = player.Functions.GetItemsByName('blueprint_document')
+     local Player = QBCore.Functions.GetPlayer(source)
+     local blueprints = Player.Functions.GetItemsByName('blueprint_document')
      local results = {}
      for _, item in pairs(blueprints) do
           local blueprint = item.info['blueprint']
@@ -25,6 +32,10 @@ QBCore.Functions.CreateCallback('keep-crafting:server:get_player_blueprints', fu
                blueprint.blueprint_id = item.info.blueprint_id
                blueprint.item_name = item.info['blueprint']
                results[#results + 1] = blueprint
+               if blueprint.item_settings.hide_until_reaches_level then
+                    PrintDebug(Colors.red .. ('`hide_until_reaches_level` is active for this blueprint [%s]'):format(item.info['blueprint']))
+                    PrintDebug(Colors.red .. "It won't show up in Blueprint menu")
+               end
           end
      end
      cb(results)
@@ -95,14 +106,31 @@ local function get_item_config(data)
      return nil
 end
 
+local function does_player_has_blueprint(Player, blueprint_id)
+     local blueprints = Player.Functions.GetItemsByName('blueprint_document')
+     local results = {}
+     for _, item in pairs(blueprints) do
+          local blueprint = item.info['blueprint']
+          if blueprint and IsBlueprint(blueprint) then
+               if item.info.blueprint_id == blueprint_id then
+                    return true
+               end
+          end
+     end
+     return false
+end
+
 local function StartCraftProcess(src, data)
      local item_name = data.item_name
      local Player = QBCore.Functions.GetPlayer(src)
      local item_config = nil
      local can_craft = false
+     local hasBlueprint = false
+
 
      if IsBlueprint(item_name) and data['blueprint_id'] then
           item_config = GetBlueprint(item_name)
+          hasBlueprint = does_player_has_blueprint(Player, data['blueprint_id'])
      elseif not IsBlueprint(item_name) and data['blueprint_id'] then
           -- item is a blueprint but we don't have it in our blueprint list
           print(Colors.red .. ('Item [%s] do not exist in our blueprint.lua'):format(item_name))
@@ -112,10 +140,15 @@ local function StartCraftProcess(src, data)
           item_config = get_item_config(data)
      end
 
+     if not hasBlueprint and data['blueprint_id'] then
+          TriggerClientEvent('QBCore:Notify', src, "You do not own this blueprint", "error")
+          return
+     end
      if not item_config then
           TriggerClientEvent('QBCore:Notify', src, Lang:t('error.crafting_failed'), "error")
           return
      end
+
      if item_config.item_settings.level and
          not (Player.PlayerData.metadata.craftingrep >= item_config.item_settings.level) then
           TriggerClientEvent('QBCore:Notify', src, Lang:t('error.need_more_exp'), "error")
