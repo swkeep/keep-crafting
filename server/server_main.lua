@@ -1,8 +1,7 @@
 local QBCore = exports['qb-core']:GetCoreObject()
-local MagicTouch = true
 
 function PrintDebug(...)
-     if MagicTouch then
+     if Config.MagicTouch then
           print(Colors.blue .. 'CraftingDebug:', ...)
      end
 end
@@ -126,7 +125,6 @@ local function StartCraftProcess(src, data)
      local item_config = nil
      local can_craft = false
      local hasBlueprint = false
-
 
      if IsBlueprint(item_name) and data['blueprint_id'] then
           item_config = GetBlueprint(item_name)

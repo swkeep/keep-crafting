@@ -7,6 +7,8 @@ Config.model_loading = {
      dealy = 50, --ms
 }
 
+Config.MagicTouch = false
+
 Config.categories = {
      ['misc'] = {
           key = 'misc',
