@@ -532,7 +532,12 @@ function QbMenu:crafting_items_list(data)
      end
 
      for item_name, item in pairs(items) do
-          item.item_name = item_name
+          if item.blueprint_id then
+               item_name = item.item_name
+               item.item_name = item_name
+          else
+               item.item_name = item_name
+          end
           if item.item_settings.hide_until_reaches_level then
                if craftingrep >= item.item_settings.level then
                     Menu[#Menu + 1] = {
@@ -608,8 +613,14 @@ function QbMenu:crafting_menu(args)
                txt = 'craft current item',
                icon = 'fa-solid fa-pen-ruler',
                params = {
-                    args = { 'sell', item, Workbench.id },
-                    event = 'keep-crafting:client_lib:craft_item'
+                    args     = {
+                         type = 'sell',
+                         item_name = item.item_name,
+                         blueprint_id = item.blueprint_id or nil,
+                         id = Workbench.id
+                    },
+                    event    = 'keep-crafting:server:craft_item',
+                    isServer = true
                }
           },
           {
@@ -674,9 +685,6 @@ AddEventHandler('keep-crafting:client_lib:check_materials_list', function(args)
      TriggerServerEvent('keep-crafting:check_materials_list', { type = args[1], item = args[2], id = args[3] })
 end)
 
-AddEventHandler('keep-crafting:client_lib:craft_item', function(args)
-     TriggerServerEvent('keep-crafting:server:craft_item', { type = args[1], item = args[2], id = args[3] })
-end)
 ------------------
 --    Events
 ------------------
