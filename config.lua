@@ -4,7 +4,7 @@ Config.menu = 'qb-menu' -- keep-menu (recommended) / qb-menu
 
 Config.model_loading = {
      timeout = 1500, --ms
-     dealy = 50, --ms
+     dealy = 50,     --ms
 }
 
 Config.MagicTouch = false
@@ -48,7 +48,7 @@ Config.categories = {
 }
 
 Config.permanent_items = {
-     'wrench'
+     ['weapon_wrench'] = true
 }
 
 local misc_recipe = {
@@ -131,10 +131,11 @@ local misc_recipe = {
                show_level_in_mail = true,
                success_rate = 100,
                amount = 1, -- crafted amount
-               duration = 60,
+               duration = 5,
                materials = {
-                    ["steel"] = 20,
-                    ["rubber"] = 20,
+                    -- ["steel"] = 20,
+                    -- ["rubber"] = 20,
+                    ["weapon_wrench"] = 1,
                },
                exp_per_craft = 5
           }
